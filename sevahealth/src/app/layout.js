@@ -2,6 +2,12 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from 'next-themes';
 import { AuthProvider } from '@/src/context/AuthContext';
 import "@/src/styles/globals.css";
+import { Roboto } from "next/font/google";
+
+const roboto = Roboto({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,7 +30,7 @@ export default function RootLayout({ children }) {
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="light"
+          defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
