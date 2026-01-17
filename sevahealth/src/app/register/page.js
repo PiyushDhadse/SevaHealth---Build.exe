@@ -163,206 +163,148 @@ export default function RegisterPage() {
             </div>
           )}
 
-          <form onSubmit={handleRegister} className="space-y-6">
-            {/* --- Personal Info Section --- */}
-            <div className="space-y-4">
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                <UserCheck size={14} /> Personal Information
-              </h3>
+        <form onSubmit={handleRegister} className="space-y-4">
+          <input
+            name="name"
+            value={formData.name}
+            placeholder="Full Name *"
+            onChange={handleChange}
+            className="w-full px-4 py-3 border rounded-xl"
+            required
+            disabled={isLoading}
+          />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Name */}
-                <div className="relative group">
-                  <div className="absolute left-3 top-3.5 text-slate-400">
-                    <User size={18} />
-                  </div>
-                  <input
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    placeholder="Full Name *"
-                    required
-                    disabled={isLoading}
-                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder:text-slate-400"
-                  />
-                </div>
+          <input
+            name="email"
+            type="email"
+            value={formData.email}
+            placeholder="Email *"
+            onChange={handleChange}
+            className="w-full px-4 py-3 border rounded-xl"
+            required
+            disabled={isLoading}
+          />
 
-                {/* Email */}
-                <div className="relative group">
-                  <div className="absolute left-3 top-3.5 text-slate-400">
-                    <Mail size={18} />
-                  </div>
-                  <input
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="Email Address *"
-                    required
-                    disabled={isLoading}
-                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder:text-slate-400"
-                  />
-                </div>
+          <input
+            name="phone"
+            value={formData.phone}
+            placeholder="Phone Number"
+            onChange={handleChange}
+            className="w-full px-4 py-3 border rounded-xl"
+            disabled={isLoading}
+          />
 
-                {/* Phone */}
-                <div className="relative group">
-                  <div className="absolute left-3 top-3.5 text-slate-400">
-                    <Phone size={18} />
-                  </div>
-                  <input
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    placeholder="Phone Number"
-                    disabled={isLoading}
-                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder:text-slate-400"
-                  />
-                </div>
+          <input
+            name="city"
+            value={formData.city}
+            placeholder="City"
+            onChange={handleChange}
+            className="w-full px-4 py-3 border rounded-xl bg-gray-100"
+            disabled={isLoading}
+          />
 
-                {/* Role Selection */}
-                <div className="relative group">
-                  <div className="absolute left-3 top-3.5 text-slate-400">
-                    {formData.role === "doctor" ? (
-                      <Stethoscope size={18} />
-                    ) : (
-                      <UserCog size={18} />
-                    )}
-                  </div>
-                  <select
-                    name="role"
-                    value={formData.role}
-                    onChange={handleChange}
-                    disabled={isLoading}
-                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all appearance-none cursor-pointer"
-                  >
-                    <option value="doctor">Doctor</option>
-                    <option value="asha_worker">ASHA Worker</option>
-                    <option value="nurse">Nurse</option>
-                    <option value="admin">Administrator</option>
-                  </select>
-                  <div className="absolute right-3 top-3.5 text-slate-400 pointer-events-none">
-                    <ArrowRight size={14} className="rotate-90" />
-                  </div>
-                </div>
-              </div>
-            </div>
+          <input
+            name="country"
+            value={formData.country}
+            placeholder="Country"
+            onChange={handleChange}
+            className="w-full px-4 py-3 border rounded-xl bg-gray-100"
+            disabled={isLoading}
+          />
 
-            {/* --- Location & ID Section --- */}
-            <div className="space-y-4 pt-2">
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                <Building size={14} /> Location & Verification
-              </h3>
+          <input
+            name="pincode"
+            value={formData.pincode}
+            placeholder="Pincode"
+            onChange={handleChange}
+            className="w-full px-4 py-3 border rounded-xl bg-gray-100"
+            disabled={isLoading}
+          />
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="relative group md:col-span-1">
-                  <div className="absolute left-3 top-3.5 text-slate-400">
-                    <MapPin size={18} />
-                  </div>
-                  <input
-                    name="city"
-                    value={formData.city}
-                    onChange={handleChange}
-                    placeholder="City"
-                    disabled={isLoading}
-                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                  />
-                </div>
-                <div className="relative group md:col-span-1">
-                  <input
-                    name="country"
-                    value={formData.country}
-                    onChange={handleChange}
-                    placeholder="Country"
-                    disabled={isLoading}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                  />
-                </div>
-                <div className="relative group md:col-span-1">
-                  <input
-                    name="pincode"
-                    value={formData.pincode}
-                    onChange={handleChange}
-                    placeholder="Pincode"
-                    disabled={isLoading}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                  />
-                </div>
-              </div>
+          <input
+            name="governmentId"
+            value={formData.governmentId}
+            placeholder="Government ID"
+            onChange={handleChange}
+            className="w-full px-4 py-3 border rounded-xl"
+            disabled={isLoading}
+          />
 
-              <div className="relative group">
-                <div className="absolute left-3 top-3.5 text-slate-400">
-                  <FileBadge size={18} />
-                </div>
-                <input
-                  name="governmentId"
-                  value={formData.governmentId}
-                  onChange={handleChange}
-                  placeholder="Government ID / Medical License Number"
-                  disabled={isLoading}
-                  className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                />
-              </div>
-            </div>
+          <select
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            className="w-full px-4 py-3 border rounded-xl"
+            disabled={isLoading}
+          >
+            <option value="doctor">Doctor</option>
+            <option value="asha_worker">ASHA Worker</option>
+            <option value="admin">Admin</option>
+            <option value="nurse">Nurse</option>
+          </select>
 
-            {/* --- Security Section --- */}
-            <div className="space-y-4 pt-2">
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                <ShieldCheck size={14} /> Security
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="relative group">
-                  <div className="absolute left-3 top-3.5 text-slate-400">
-                    <Lock size={18} />
-                  </div>
-                  <input
-                    name="password"
-                    type="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    placeholder="Password *"
-                    required
-                    disabled={isLoading}
-                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                  />
-                </div>
-                <div className="relative group">
-                  <div className="absolute left-3 top-3.5 text-slate-400">
-                    <Lock size={18} />
-                  </div>
-                  <input
-                    name="confirmPassword"
-                    type="password"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    placeholder="Confirm Password *"
-                    required
-                    disabled={isLoading}
-                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                  />
-                </div>
-              </div>
-            </div>
+          <div className="space-y-2">
+            <input
+              name="password"
+              type="password"
+              value={formData.password}
+              placeholder="Password * (min 6 characters)"
+              onChange={handleChange}
+              className="w-full px-4 py-3 border rounded-xl"
+              required
+              minLength={6}
+              disabled={isLoading}
+            />
+          </div>
 
-            {/* Actions */}
-            <div className="pt-4">
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-xl font-bold text-sm shadow-lg shadow-indigo-200 flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
-              >
-                {isLoading ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Creating Account...
-                  </>
-                ) : (
-                  <>
-                    Complete Registration <ArrowRight size={18} />
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
+          <input
+            name="confirmPassword"
+            type="password"
+            value={formData.confirmPassword}
+            placeholder="Confirm Password *"
+            onChange={handleChange}
+            className="w-full px-4 py-3 border rounded-xl"
+            required
+            disabled={isLoading}
+          />
+
+          <button
+            disabled={isLoading}
+            className={`w-full py-3 rounded-xl font-semibold transition-all ${
+              isLoading
+                ? "bg-blue-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+            } text-white`}
+          >
+            {isLoading ? (
+              <span className="flex items-center justify-center">
+                <svg
+                  className="animate-spin h-5 w-5 mr-3 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Registering...
+              </span>
+            ) : (
+              "Register"
+            )}
+          </button>
+        </form>
 
           {/* Footer Controls */}
           <div className="mt-8 flex flex-col md:flex-row items-center justify-between gap-4 border-t border-slate-100 pt-6">
