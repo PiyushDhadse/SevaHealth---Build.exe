@@ -93,8 +93,10 @@ export default function RegisterPage() {
 
       if (error) throw error;
 
-      setSuccess("Registration successful. Verify your email.");
-      setTimeout(() => router.push("/login"), 2000);
+      setSuccess("Registration successful. Redirecting to dashboard...");
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 1500);
 
     } catch (err) {
       setError(err.message);
