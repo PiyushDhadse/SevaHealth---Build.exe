@@ -1,306 +1,541 @@
-'use client';
-import { 
-  Users, 
-  Activity, 
-  UserCheck, 
-  AlertTriangle, 
-  TrendingUp, 
-  Calendar, 
-  Download, 
-  RefreshCw, 
-  UserPlus, 
-  Stethoscope 
-} from 'lucide-react';
-import { useDashboardData } from '@/src/lib/hooks/useDashboardData';
-import { initializeDemoData } from '@/src/lib/storage/localStorage';
-import { useEffect } from 'react';
+"use client";
 
+import React, { useState, useEffect, useRef } from "react";
+import {
+  Users,
+  Activity,
+  UserCheck,
+  AlertTriangle,
+  RefreshCw,
+  UserPlus,
+  ArrowUpRight,
+  MoreVertical,
+  Calendar,
+  CheckCircle2,
+  X,
+  Phone,
+  FileText,
+  XCircle,
+} from "lucide-react";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { motion, AnimatePresence } from "framer-motion";
 
-export default function DashboardPage() {
-  const {
-    dashboardStats,
-    chartData,
-    recentActivities,
-    urgentAlerts,
-    isLoading,
-    handleManualSync,
-    addDemoPatient,
-    addDemoVisit,
-  } = useDashboardData();
+// --- MOCK DATA FOR CHART ---
+const chartData = [
+  { name: "Mon", visits: 24, critical: 4 },
+  { name: "Tue", visits: 38, critical: 6 },
+  { name: "Wed", visits: 32, critical: 3 },
+  { name: "Thu", visits: 45, critical: 8 },
+  { name: "Fri", visits: 62, critical: 12 },
+  { name: "Sat", visits: 55, critical: 9 },
+  { name: "Sun", visits: 48, critical: 5 },
+];
 
+export default function DashboardMain() {
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [activeMenuId, setActiveMenuId] = useState(null);
+
+  // --- NOTIFICATION SYSTEM ---
+  const addNotification = (title, message, type = "success") => {
+    const id = Date.now();
+    setNotifications((prev) => [...prev, { id, title, message, type }]);
+    setTimeout(() => {
+      setNotifications((prev) => prev.filter((n) => n.id !== id));
+    }, 4000);
+  };
+
+  const handleManualSync = () => {
+    if (isSyncing) return;
+    setIsSyncing(true);
+    addNotification(
+      "Sync Started",
+      "Uploading offline records to server...",
+      "info",
+    );
+
+    setTimeout(() => {
+      setIsSyncing(false);
+      addNotification(
+        "Sync Complete",
+        "All patient records are up to date.",
+        "success",
+      );
+    }, 2500);
+  };
+
+  // Close menus when clicking outside
   useEffect(() => {
-    initializeDemoData();
+    const handleClickOutside = () => setActiveMenuId(null);
+    window.addEventListener("click", handleClickOutside);
+    return () => window.removeEventListener("click", handleClickOutside);
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading dashboard data...</p>
-        </div>
+  return (
+    <div className="flex-1 h-full overflow-y-auto bg-slate-50/50 p-4 md:p-8 space-y-8 font-sans text-slate-900">
+      {/* --- NOTIFICATION TOAST CONTAINER --- */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none">
+        <AnimatePresence>
+          {notifications.map((n) => (
+            <Toast
+              key={n.id}
+              {...n}
+              onClose={() =>
+                setNotifications((prev) =>
+                  prev.filter((item) => item.id !== n.id),
+                )
+              }
+            />
+          ))}
+        </AnimatePresence>
       </div>
-    );
-  }
 
-  const maxVisits = Math.max(...chartData.map(d => d.visits));
+      {/* --- HERO SECTION --- */}
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="relative overflow-hidden rounded-3xl bg-slate-900 p-8 md:p-10 text-white shadow-xl shadow-indigo-200/40"
+      >
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+          <div className="max-w-2xl space-y-4">
+            <div className="flex items-center gap-2">
+              <span className="flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+              </span>
+              <span className="text-slate-400 text-xs font-semibold tracking-wide uppercase">
+                District Overview
+              </span>
+            </div>
+
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+              Welcome back,{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-300">
+                Dr. Rao
+              </span>
+            </h1>
+            <p className="text-slate-400 text-lg max-w-lg">
+              You have{" "}
+              <span className="text-white font-semibold">
+                4 high-risk patients
+              </span>{" "}
+              requiring attention today.
+            </p>
+          </div>
+
+          <div className="flex gap-4">
+            <button
+              onClick={handleManualSync}
+              className="group relative flex items-center gap-3 px-6 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all active:scale-95"
+            >
+              <RefreshCw
+                size={20}
+                className={`text-indigo-400 transition-all duration-700 ${isSyncing ? "animate-spin" : "group-hover:rotate-180"}`}
+              />
+              <span className="font-semibold text-sm">
+                {isSyncing ? "Syncing..." : "Sync Data"}
+              </span>
+            </button>
+
+            <button className="flex items-center gap-3 px-6 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-600/20 transition-all active:scale-95">
+              <UserPlus size={20} className="text-white" />
+              <span className="font-semibold text-sm">New Patient</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Abstract Backgrounds */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl -ml-20 -mb-20 pointer-events-none" />
+      </motion.section>
+
+      {/* --- STATS GRID --- */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatCard
+          delay={0.1}
+          icon={<Users />}
+          label="Total Patients"
+          value="1,248"
+          trend="+12%"
+          color="indigo"
+        />
+        <StatCard
+          delay={0.2}
+          icon={<Activity />}
+          label="Screenings Today"
+          value="89"
+          trend="+5%"
+          color="cyan"
+        />
+        <StatCard
+          delay={0.3}
+          icon={<UserCheck />}
+          label="ASHA Active"
+          value="47"
+          trend="Stable"
+          color="emerald"
+        />
+        <StatCard
+          delay={0.4}
+          icon={<AlertTriangle />}
+          label="Pending Alerts"
+          value="23"
+          trend="+3"
+          color="rose"
+        />
+      </div>
+
+      {/* --- MAIN DASHBOARD CONTENT --- */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* CHART SECTION */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+          className="lg:col-span-2 bg-white rounded-3xl border border-slate-200 shadow-sm p-6 md:p-8"
+        >
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h3 className="text-xl font-bold text-slate-800">
+                Weekly Screening Trends
+              </h3>
+              <p className="text-sm text-slate-500">
+                Patient visits vs Critical cases
+              </p>
+            </div>
+            <div className="flex gap-2 text-sm">
+              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 font-medium">
+                <span className="w-2 h-2 rounded-full bg-indigo-500"></span>{" "}
+                Visits
+              </span>
+              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-rose-700 font-medium">
+                <span className="w-2 h-2 rounded-full bg-rose-500"></span>{" "}
+                Critical
+              </span>
+            </div>
+          </div>
+
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart
+                data={chartData}
+                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+              >
+                <defs>
+                  <linearGradient id="colorVisits" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient
+                    id="colorCritical"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#f43f5e" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="#e2e8f0"
+                />
+                <XAxis
+                  dataKey="name"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#64748b", fontSize: 12 }}
+                  dy={10}
+                />
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#64748b", fontSize: 12 }}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#1e293b",
+                    border: "none",
+                    borderRadius: "12px",
+                    color: "#fff",
+                  }}
+                  itemStyle={{ color: "#fff" }}
+                  cursor={{
+                    stroke: "#cbd5e1",
+                    strokeWidth: 1,
+                    strokeDasharray: "4 4",
+                  }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="visits"
+                  stroke="#6366f1"
+                  strokeWidth={3}
+                  fillOpacity={1}
+                  fill="url(#colorVisits)"
+                />
+                <Area
+                  type="monotone"
+                  dataKey="critical"
+                  stroke="#f43f5e"
+                  strokeWidth={3}
+                  fillOpacity={1}
+                  fill="url(#colorCritical)"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </motion.div>
+
+        {/* CRITICAL PATIENTS LIST */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.6 }}
+          className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 md:p-8 flex flex-col"
+        >
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-bold text-slate-800">
+              Critical Attention
+            </h3>
+            <button className="text-slate-400 hover:text-indigo-600 transition-colors">
+              <Calendar size={20} />
+            </button>
+          </div>
+
+          <div className="space-y-4 flex-1 overflow-y-auto pr-2 custom-scrollbar max-h-[400px]">
+            <PatientItem
+              id={1}
+              name="Rajesh Patel"
+              diagnosis="Severe Hypertension"
+              time="10:30 AM"
+              severity="high"
+              activeMenuId={activeMenuId}
+              setActiveMenuId={setActiveMenuId}
+              onAction={addNotification}
+            />
+            <PatientItem
+              id={2}
+              name="Meena Sharma"
+              diagnosis="High Fever (104°F)"
+              time="11:15 AM"
+              severity="high"
+              activeMenuId={activeMenuId}
+              setActiveMenuId={setActiveMenuId}
+              onAction={addNotification}
+            />
+            <PatientItem
+              id={3}
+              name="Anil Kumar"
+              diagnosis="Diabetic Ketoacidosis"
+              time="01:00 PM"
+              severity="med"
+              activeMenuId={activeMenuId}
+              setActiveMenuId={setActiveMenuId}
+              onAction={addNotification}
+            />
+            <PatientItem
+              id={4}
+              name="Sunita Rao"
+              diagnosis="Post-natal Checkup"
+              time="02:30 PM"
+              severity="med"
+              activeMenuId={activeMenuId}
+              setActiveMenuId={setActiveMenuId}
+              onAction={addNotification}
+            />
+            <PatientItem
+              id={5}
+              name="Vikram Singh"
+              diagnosis="Chest Pain"
+              time="03:45 PM"
+              severity="high"
+              activeMenuId={activeMenuId}
+              setActiveMenuId={setActiveMenuId}
+              onAction={addNotification}
+            />
+          </div>
+
+          <button className="w-full mt-6 py-3 rounded-xl border border-slate-200 text-slate-600 text-sm font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all">
+            View Full Patient List
+          </button>
+        </motion.div>
+      </div>
+
+      <div className="text-center text-slate-400 text-xs py-4">
+        Last updated: {new Date().toLocaleTimeString()} • Secure connection
+        established
+      </div>
+    </div>
+  );
+}
+
+// --- SUB COMPONENTS ---
+
+function StatCard({ icon, label, value, trend, color, delay }) {
+  const colorStyles = {
+    indigo: "bg-indigo-50 text-indigo-600",
+    cyan: "bg-cyan-50 text-cyan-600",
+    emerald: "bg-emerald-50 text-emerald-600",
+    rose: "bg-rose-50 text-rose-600",
+  };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay }}
+      className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow"
+    >
+      <div className="flex justify-between items-start mb-4">
+        <div className={`p-3 rounded-xl ${colorStyles[color]}`}>
+          {React.cloneElement(icon, { size: 24 })}
+        </div>
+        <div className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">
+          {trend !== "Stable" && <ArrowUpRight size={12} />}
+          {trend}
+        </div>
+      </div>
+      <p className="text-slate-500 font-medium text-sm mb-1">{label}</p>
+      <h3 className="text-2xl font-bold text-slate-900">{value}</h3>
+    </motion.div>
+  );
+}
+
+function PatientItem({
+  id,
+  name,
+  diagnosis,
+  time,
+  severity,
+  activeMenuId,
+  setActiveMenuId,
+  onAction,
+}) {
+  const isMenuOpen = activeMenuId === id;
+  const severityColor =
+    severity === "high"
+      ? "bg-rose-100 text-rose-700"
+      : "bg-amber-100 text-amber-700";
+
+  const handleMenuClick = (e) => {
+    e.stopPropagation();
+    setActiveMenuId(isMenuOpen ? null : id);
+  };
+
+  const handleAction = (action) => {
+    onAction("Action Taken", `${action} for ${name}`, "success");
+    setActiveMenuId(null);
+  };
+
+  return (
+    <div className="relative flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100 group hover:border-indigo-200 hover:shadow-sm transition-all">
+      <div className="flex items-center gap-4">
+        <div
+          className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${severity === "high" ? "bg-rose-200 text-rose-800" : "bg-amber-200 text-amber-800"}`}
+        >
+          {name.charAt(0)}
+        </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
-          <p className="text-gray-600">Welcome back! Here&apos;s what&apos;s happening today.</p>
-          
-          <div className="flex items-center space-x-4 mt-2">
-            <div className="flex items-center text-sm">
-              <div className={`w-2 h-2 rounded-full mr-2 ${dashboardStats.isOnline ? 'bg-green-500' : 'bg-yellow-500'}`} />
-              <span className="text-gray-600">
-                {dashboardStats.isOnline ? 'Online' : 'Offline'}
-                {dashboardStats.pendingSyncs > 0 && ` • ${dashboardStats.pendingSyncs} pending syncs`}
-              </span>
-            </div>
-            {dashboardStats.lastSync && (
-              <span className="text-sm text-gray-500">
-                Last sync: {new Date(dashboardStats.lastSync).toLocaleTimeString()}
-              </span>
+          <h4 className="font-bold text-slate-800 text-sm">{name}</h4>
+          <p className="text-xs text-slate-500 font-medium">{diagnosis}</p>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <span
+          className={`text-[10px] uppercase font-bold px-2 py-1 rounded-md ${severityColor}`}
+        >
+          {severity}
+        </span>
+
+        {/* Three Dots Menu Trigger */}
+        <div className="relative">
+          <button
+            onClick={handleMenuClick}
+            className={`p-1.5 rounded-lg transition-colors ${isMenuOpen ? "bg-indigo-100 text-indigo-600" : "text-slate-400 hover:bg-white hover:text-indigo-600"}`}
+          >
+            <MoreVertical size={18} />
+          </button>
+
+          {/* Dropdown Menu */}
+          <AnimatePresence>
+            {isMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                className="absolute right-0 top-8 z-20 w-48 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden origin-top-right"
+              >
+                <button
+                  onClick={() => handleAction("Opened Profile")}
+                  className="w-full text-left px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 flex items-center gap-2"
+                >
+                  <FileText size={14} /> View Profile
+                </button>
+                <button
+                  onClick={() => handleAction("Contacted")}
+                  className="w-full text-left px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 flex items-center gap-2"
+                >
+                  <Phone size={14} /> Contact Patient
+                </button>
+                <div className="h-px bg-slate-100 my-0"></div>
+                <button
+                  onClick={() => handleAction("Marked Resolved")}
+                  className="w-full text-left px-4 py-3 text-sm font-medium text-rose-600 hover:bg-rose-50 flex items-center gap-2"
+                >
+                  <CheckCircle2 size={14} /> Mark Resolved
+                </button>
+              </motion.div>
             )}
-          </div>
-        </div>
-        
-        <div className="flex items-center space-x-3 mt-3 sm:mt-0">
-          <button className="flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
-            <Calendar className="w-4 h-4 mr-2" />
-            This Week
-          </button>
-          
-          <button
-            onClick={handleManualSync}
-            disabled={dashboardStats.isSyncing}
-            className="flex items-center px-3 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50"
-          >
-            <RefreshCw className={`w-4 h-4 mr-2 ${dashboardStats.isSyncing ? 'animate-spin' : ''}`} />
-            {dashboardStats.isSyncing ? 'Syncing...' : 'Sync Now'}
-          </button>
-          
-          <button
-            onClick={addDemoPatient}
-            className="flex items-center px-3 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700"
-            title="Add demo patient"
-          >
-            <UserPlus className="w-4 h-4 mr-1" />
-          </button>
-          
-          <button
-            onClick={addDemoVisit}
-            className="flex items-center px-3 py-2 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700"
-            title="Add demo visit"
-          >
-            <Stethoscope className="w-4 h-4 mr-1" />
-          </button>
-          
-          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
-            <Download className="w-4 h-4 mr-2" />
-            Export Report
-          </button>
-        </div>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Total Patients"
-          value={dashboardStats.totalPatients.toLocaleString()}
-          change="+12%"
-          icon={Users}
-          color="blue"
-          trend="up"
-        />
-        <StatCard
-          title="Active Cases"
-          value={dashboardStats.activeCases}
-          change="-3%"
-          icon={Activity}
-          color="green"
-          trend="down"
-        />
-        <StatCard
-          title="ASHA Workers"
-          value={dashboardStats.ashaWorkers}
-          change="+2"
-          icon={UserCheck}
-          color="purple"
-          trend="up"
-        />
-        <StatCard
-          title="Urgent Alerts"
-          value={dashboardStats.urgentAlerts}
-          change="+3"
-          icon={AlertTriangle}
-          color="red"
-          trend="up"
-        />
-      </div>
-
-      {/* Charts and Alerts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Patient Visits Chart */}
-        <div className="lg:col-span-2">
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <div className="flex justify-between items-center mb-6">
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900">Patient Visits Overview</h2>
-                <p className="text-sm text-gray-500">Monthly trend for the last 7 months</p>
-              </div>
-              <div className="flex items-center space-x-2">
-                <TrendingUp className="w-5 h-5 text-green-500" />
-                <span className="text-sm font-medium text-green-600">+18% growth</span>
-              </div>
-            </div>
-            
-            {/* Simple Bar Chart */}
-            <div className="h-64 flex items-end space-x-2 pt-8">
-              {chartData.map((item, index) => {
-                const height = (item.visits / maxVisits) * 100;
-                return (
-                  <div key={index} className="flex-1 flex flex-col items-center">
-                    <div
-                      className="w-full bg-blue-500 rounded-t-lg hover:bg-blue-600 transition-colors"
-                      style={{ height: `${height}%` }}
-                      title={`${item.visits} visits`}
-                    />
-                    <span className="text-xs text-gray-500 mt-2">{item.month}</span>
-                    <span className="text-xs font-medium mt-1">{item.visits}</span>
-                  </div>
-                );
-              })}
-            </div>
-            
-            {/* Chart Legend */}
-            <div className="flex items-center justify-center mt-6 space-x-4">
-              <div className="flex items-center">
-                <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
-                <span className="text-sm text-gray-600">Patient Visits</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Column - Alerts & Activities */}
-        <div className="space-y-6">
-          {/* Urgent Alerts */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">Urgent Alerts</h2>
-              <span className="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
-                {urgentAlerts.length} Active
-              </span>
-            </div>
-            
-            <div className="space-y-4">
-              {urgentAlerts.map((alert) => (
-                <div key={alert.id} className="p-3 border border-red-200 bg-red-50 rounded-lg">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="font-medium text-gray-900">{alert.title}</p>
-                      <p className="text-sm text-gray-600">Patient: {alert.patientName || 'Unknown'}</p>
-                    </div>
-                    <span className="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded">
-                      High
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center mt-2">
-                    <span className="text-xs text-gray-500">
-                      Requires immediate attention
-                    </span>
-                    <button className="text-xs text-blue-600 hover:text-blue-800 font-medium">
-                      Take Action →
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-            
-            <button className="w-full mt-4 text-center text-sm text-blue-600 hover:text-blue-800 font-medium">
-              View All Alerts →
-            </button>
-          </div>
-
-          {/* Recent Activities */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Activities</h2>
-            
-            <div className="space-y-4">
-              {recentActivities.map((activity) => (
-                <div key={activity.id} className="flex items-start">
-                  <div className={`w-2 h-2 rounded-full mt-2 mr-3 ${
-                    activity.type === 'patient' ? 'bg-blue-500' :
-                    activity.type === 'visit' ? 'bg-green-500' :
-                    activity.type === 'report' ? 'bg-purple-500' : 'bg-red-500'
-                  }`} />
-                  <div className="flex-1">
-                    <p className="text-sm text-gray-900">{activity.activity}</p>
-                    <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            
-            <button className="w-full mt-4 text-center text-sm text-blue-600 hover:text-blue-800 font-medium">
-              View Activity Log →
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom Stats Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h3 className="text-sm font-medium text-gray-900 mb-2">Avg. Visit Duration</h3>
-          <p className="text-2xl font-bold text-gray-900">24 min</p>
-          <p className="text-sm text-green-600 mt-1">+2 min from last month</p>
-        </div>
-        
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h3 className="text-sm font-medium text-gray-900 mb-2">Patient Satisfaction</h3>
-          <p className="text-2xl font-bold text-gray-900">94%</p>
-          <p className="text-sm text-green-600 mt-1">+3% from last quarter</p>
-        </div>
-        
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h3 className="text-sm font-medium text-gray-900 mb-2">Offline Data</h3>
-          <p className="text-2xl font-bold text-gray-900">{dashboardStats.pendingSyncs} entries</p>
-          <p className="text-sm text-blue-600 mt-1">Ready to sync</p>
+          </AnimatePresence>
         </div>
       </div>
     </div>
   );
 }
 
-// StatCard Component
-function StatCard({ title, value, change, icon: Icon, color, trend }) {
-  const colorClasses = {
-    blue: 'bg-blue-50 text-blue-600',
-    green: 'bg-green-50 text-green-600',
-    purple: 'bg-purple-50 text-purple-600',
-    red: 'bg-red-50 text-red-600',
-  };
+function Toast({ title, message, type, onClose }) {
+  const bgStyles =
+    type === "success"
+      ? "bg-slate-900 border-l-4 border-green-500"
+      : "bg-slate-900 border-l-4 border-indigo-500";
+  const icon =
+    type === "success" ? (
+      <CheckCircle2 className="text-green-500" />
+    ) : (
+      <RefreshCw className="text-indigo-500 animate-spin" />
+    );
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-sm transition-shadow">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-gray-500">{title}</p>
-          <p className="text-2xl font-bold mt-1">{value}</p>
-          <p className={`text-xs mt-1 ${trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-            {trend === 'up' ? '↗' : '↘'} {change} from last month
-          </p>
-        </div>
-        <div className={`p-3 rounded-full ${colorClasses[color]}`}>
-          <Icon className="w-6 h-6" />
-        </div>
+    <motion.div
+      initial={{ x: 100, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      exit={{ x: 100, opacity: 0 }}
+      className={`pointer-events-auto flex items-start gap-3 p-4 rounded-lg shadow-2xl min-w-[320px] max-w-sm ${bgStyles}`}
+    >
+      <div className="mt-0.5">{icon}</div>
+      <div className="flex-1">
+        <h4 className="text-white text-sm font-bold">{title}</h4>
+        <p className="text-slate-400 text-xs mt-1">{message}</p>
       </div>
-    </div>
+      <button
+        onClick={onClose}
+        className="text-slate-500 hover:text-white transition-colors"
+      >
+        <X size={16} />
+      </button>
+    </motion.div>
   );
 }
