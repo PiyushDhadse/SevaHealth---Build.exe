@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import Sidebar from '@/src/components/dashboard/sidebar';
+import Sidebar from '@/src/components/dashboard/Sidebar';
 import Navbar from '@/src/components/dashboard/Navbar';
 
 export default function DashboardLayout({ children }) {
