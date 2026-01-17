@@ -1,27 +1,78 @@
 'use client';
 
-import { Search, Plus, Eye, Edit, Download } from 'lucide-react';
-import { useState } from 'react';
-import PatientDetails from './PatientDetails'; // Add this import
+import { Search, Plus, Eye, Edit, Download, AlertCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import PatientDetails from './PatientDetails';
+import { useAuth } from '@/src/context/AuthContext';
+import { useRolePermissions } from '@/src/lib/rbac';
+import { PERMISSIONS } from '@/src/lib/rbac/permissions';
 
-const patients = [
+// Mock patients data - In production, this would come from Supabase
+// Each patient should have a 'created_by' or 'asha_worker_id' field
+const mockPatients = [
     {
         id: 'PAT001',
         name: 'Aarav Sharma',
         status: 'At Risk',
         age: 45,
         ashaWorker: 'Meena Kumari',
+        ashaWorkerId: 'user_123', // ASHA worker ID who created this patient
         lastVisit: '20/07/2024',
         contact: '+91 98765 43210',
-        location: 'Sector 12, Delhi'
+        location: 'Sector 12, Delhi',
+        created_by: 'user_123' // User who created this patient
     },
-    // ... rest of your patients array
+    {
+        id: 'PAT002',
+        name: 'Priya Verma',
+        status: 'Stable',
+        age: 32,
+        ashaWorker: 'Sunita Devi',
+        ashaWorkerId: 'user_456',
+        lastVisit: '22/07/2024',
+        contact: '+91 98765 43211',
+        location: 'Sector 15, Delhi',
+        created_by: 'user_456'
+    },
+    {
+        id: 'PAT003',
+        name: 'Rajesh Kumar',
+        status: 'Critical',
+        age: 58,
+        ashaWorker: 'Meena Kumari',
+        ashaWorkerId: 'user_123',
+        lastVisit: '19/07/2024',
+        contact: '+91 98765 43212',
+        location: 'Sector 12, Delhi',
+        created_by: 'user_123'
+    }
 ];
 
 export default function PatientsPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState('All');
-    const [selectedPatient, setSelectedPatient] = useState(null); // Add this state
+    const [selectedPatient, setSelectedPatient] = useState(null);
+    const [patients, setPatients] = useState([]);
+    
+    const { user } = useAuth();
+    const { hasPermission, canViewAll, isAshaWorker } = useRolePermissions();
+
+    useEffect(() => {
+        // Load patients based on user role
+        loadPatients();
+    }, [user]);
+
+    const loadPatients = () => {
+        // In production, fetch from Supabase with role-based filtering
+        let filteredData = mockPatients;
+        
+        // If ASHA worker, only show their own patients
+        if (isAshaWorker && user) {
+            filteredData = mockPatients.filter(p => p.created_by === user.id || p.ashaWorkerId === user.id);
+        }
+        
+        setPatients(filteredData);
+    };
 
     // Filter patients based on search and status
     const filteredPatients = patients.filter(patient => {
@@ -38,7 +89,7 @@ export default function PatientsPage() {
         'Critical': 'bg-red-100 text-red-800'
     };
 
-    const handleViewPatient = (patient) => { // Updated function
+    const handleViewPatient = (patient) => {
         setSelectedPatient(patient);
     };
 
@@ -47,21 +98,63 @@ export default function PatientsPage() {
     };
 
     const handleAddPatient = () => {
+        if (!hasPermission(PERMISSIONS.CREATE_PATIENT)) {
+            alert('You do not have permission to add patients');
+            return;
+        }
         console.log('Adding new patient');
         // Open add patient modal/form
     };
 
+    const handleEditPatient = (patient) => {
+        if (!hasPermission(PERMISSIONS.EDIT_PATIENT)) {
+            alert('You do not have permission to edit patients');
+            return;
+        }
+        
+        // ASHA workers can only edit their own patients
+        if (isAshaWorker && patient.created_by !== user?.id) {
+            alert('You can only edit patients you created');
+            return;
+        }
+        
+        console.log('Editing patient:', patient.id);
+        // Open edit patient modal/form
+    };
+
     const handleExportData = () => {
+        if (!hasPermission(PERMISSIONS.GENERATE_REPORT)) {
+            alert('You do not have permission to export data');
+            return;
+        }
         console.log('Exporting patient data');
         // Implement export functionality
     };
 
     return (
         <div className="min-h-screen bg-gray-50 p-6">
+            {/* Role Indicator */}
+            {isAshaWorker && (
+                <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start">
+                    <AlertCircle className="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" />
+                    <div>
+                        <p className="text-sm font-medium text-blue-900">ASHA Worker View</p>
+                        <p className="text-xs text-blue-700 mt-1">
+                            You are viewing only the patients you have created or are assigned to.
+                            {!canViewAll && ' To view all patients, contact your administrator.'}
+                        </p>
+                    </div>
+                </div>
+            )}
+
             {/* Header */}
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-gray-800">Patient Records</h1>
-                <p className="text-gray-600 mt-2">Manage and view all patient data.</p>
+                <p className="text-gray-600 mt-2">
+                    {canViewAll 
+                        ? 'Manage and view all patient data across the system.' 
+                        : 'Manage and view your assigned patient data.'}
+                </p>
             </div>
 
             {/* Filters and Actions */}
@@ -96,20 +189,24 @@ export default function PatientsPage() {
 
                     {/* Action Buttons */}
                     <div className="flex gap-3">
-                        <button
-                            onClick={handleExportData}
-                            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                        >
-                            <Download size={18} />
-                            Export
-                        </button>
-                        <button
-                            onClick={handleAddPatient}
-                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                        >
-                            <Plus size={18} />
-                            Add New Patient
-                        </button>
+                        {hasPermission(PERMISSIONS.GENERATE_REPORT) && (
+                            <button
+                                onClick={handleExportData}
+                                className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                            >
+                                <Download size={18} />
+                                Export
+                            </button>
+                        )}
+                        {hasPermission(PERMISSIONS.CREATE_PATIENT) && (
+                            <button
+                                onClick={handleAddPatient}
+                                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                            >
+                                <Plus size={18} />
+                                Add New Patient
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>
@@ -129,46 +226,58 @@ export default function PatientsPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredPatients.map((patient) => (
-                                <tr key={patient.id} className="border-b border-gray-100 hover:bg-gray-50">
-                                    <td className="py-4 px-6">
-                                        <div>
-                                            <p className="font-medium text-gray-800">{patient.name}</p>
-                                            <p className="text-sm text-gray-500">{patient.id}</p>
-                                        </div>
-                                    </td>
-                                    <td className="py-4 px-6">
-                                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[patient.status]}`}>
-                                            {patient.status}
-                                        </span>
-                                    </td>
-                                    <td className="py-4 px-6 text-gray-700">{patient.age}</td>
-                                    <td className="py-4 px-6">
-                                        <div>
-                                            <p className="text-gray-700">{patient.ashaWorker}</p>
-                                            <p className="text-sm text-gray-500">{patient.location}</p>
-                                        </div>
-                                    </td>
-                                    <td className="py-4 px-6 text-gray-700">{patient.lastVisit}</td>
-                                    <td className="py-4 px-6">
-                                        <div className="flex gap-2">
-                                            <button
-                                                onClick={() => handleViewPatient(patient)} // Pass the patient object
-                                                className="p-2 text-blue-600 hover:bg-blue-50 rounded"
-                                                title="View Details"
-                                            >
-                                                <Eye size={18} />
-                                            </button>
-                                            <button
-                                                className="p-2 text-green-600 hover:bg-green-50 rounded"
-                                                title="Edit Patient"
-                                            >
-                                                <Edit size={18} />
-                                            </button>
-                                        </div>
+                            {filteredPatients.length > 0 ? (
+                                filteredPatients.map((patient) => (
+                                    <tr key={patient.id} className="border-b border-gray-100 hover:bg-gray-50">
+                                        <td className="py-4 px-6">
+                                            <div>
+                                                <p className="font-medium text-gray-800">{patient.name}</p>
+                                                <p className="text-sm text-gray-500">{patient.id}</p>
+                                            </div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[patient.status]}`}>
+                                                {patient.status}
+                                            </span>
+                                        </td>
+                                        <td className="py-4 px-6 text-gray-700">{patient.age}</td>
+                                        <td className="py-4 px-6">
+                                            <div>
+                                                <p className="text-gray-700">{patient.ashaWorker}</p>
+                                                <p className="text-sm text-gray-500">{patient.location}</p>
+                                            </div>
+                                        </td>
+                                        <td className="py-4 px-6 text-gray-700">{patient.lastVisit}</td>
+                                        <td className="py-4 px-6">
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={() => handleViewPatient(patient)}
+                                                    className="p-2 text-blue-600 hover:bg-blue-50 rounded"
+                                                    title="View Details"
+                                                >
+                                                    <Eye size={18} />
+                                                </button>
+                                                {(hasPermission(PERMISSIONS.EDIT_PATIENT) && 
+                                                  (canViewAll || patient.created_by === user?.id)) && (
+                                                    <button
+                                                        onClick={() => handleEditPatient(patient)}
+                                                        className="p-2 text-green-600 hover:bg-green-50 rounded"
+                                                        title="Edit Patient"
+                                                    >
+                                                        <Edit size={18} />
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="6" className="py-8 text-center text-gray-500">
+                                        No patients found matching your criteria
                                     </td>
                                 </tr>
-                            ))}
+                            )}
                         </tbody>
                     </table>
                 </div>
@@ -198,7 +307,9 @@ export default function PatientsPage() {
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
                 <div className="bg-white p-5 rounded-xl shadow border">
-                    <h3 className="text-gray-500 text-sm font-medium">Total Patients</h3>
+                    <h3 className="text-gray-500 text-sm font-medium">
+                        {canViewAll ? 'Total Patients' : 'My Patients'}
+                    </h3>
                     <p className="text-2xl font-bold text-gray-800 mt-2">{patients.length}</p>
                 </div>
                 <div className="bg-white p-5 rounded-xl shadow border">

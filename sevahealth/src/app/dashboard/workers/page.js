@@ -3,6 +3,8 @@
 
 import { Users, Clock, MapPin, Phone, Mail } from 'lucide-react';
 import { useState } from 'react';
+import { ProtectedRoute } from '@/src/lib/rbac';
+import { ROLES } from '@/src/lib/rbac/permissions';
 
 const ashaWorkers = [
     {
@@ -67,7 +69,7 @@ const ashaWorkers = [
     }
 ];
 
-export default function WorkersPage() {
+function WorkersPageContent() {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterArea, setFilterArea] = useState('All');
 
@@ -232,5 +234,13 @@ export default function WorkersPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function WorkersPage() {
+    return (
+        <ProtectedRoute allowedRoles={[ROLES.DOCTOR, ROLES.SUPERVISOR]}>
+            <WorkersPageContent />
+        </ProtectedRoute>
     );
 }
