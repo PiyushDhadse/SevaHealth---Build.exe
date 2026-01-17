@@ -18,6 +18,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/src/context/AuthContext";
 import { ROLES } from "@/src/lib/rbac";
+import ThemeToggle from "@/src/components/ThemeToggle";
+
 
 // Navigation configuration
 const navItems = [
@@ -177,6 +179,14 @@ export default function Sidebar() {
 
       {/* --- USER PROFILE FOOTER --- */}
       <div className="p-4 border-t border-slate-100 bg-slate-50/50">
+        
+        <div className="bg-white border border-slate-200/60 rounded-2xl p-3 shadow-sm">
+          <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-2">
+            Appearance
+          </p>
+        <ThemeToggle />
+      </div>
+      
         <div className="bg-white border border-slate-200/60 rounded-2xl p-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer group">
           <div className="flex items-center gap-3">
             <div className="relative">
