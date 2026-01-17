@@ -30,9 +30,12 @@ export default function RootLayout({ children }) {
         >
           <AuthProvider>
             <main className="flex-1">
-                {children}
-              </main>
-              <script src='https://www.noupe.com/embed/019bcd2db7a97374a2a05c1d9569d0fa2144.js'></script>
+              {children}
+            </main>
+
+            <script src="https://cdn.botpress.cloud/webchat/v3.5/inject.js"></script>
+            <script src="https://files.bpcontent.cloud/2026/01/17/19/20260117192945-LU810R2V.js" defer></script>
+
           </AuthProvider>
         </ThemeProvider>
       </body>
