@@ -1,4 +1,8 @@
+'use client';
 import DoctorCard from '@/src/components/dashboard/doctors/DoctorCard';
+import { ProtectedRoute, useRolePermissions } from '@/src/lib/rbac';
+import { ROLES } from '@/src/lib/rbac/permissions';
+import { Stethoscope } from 'lucide-react';
 
 const doctors = [
     {
@@ -69,12 +73,50 @@ const doctors = [
     }
 ];
 
-export default function DoctorsPage() {
+function DoctorsPageContent() {
+    const { isAshaWorker } = useRolePermissions();
+    
     return (
         <div className="min-h-screen bg-gray-50 p-6">
+            {/* ASHA Worker Helper Banner */}
+            {isAshaWorker && (
+                <div className="mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6">
+                    <div className="flex items-start">
+                        <div className="flex-shrink-0">
+                            <Stethoscope className="w-8 h-8 text-blue-600" />
+                        </div>
+                        <div className="ml-4 flex-1">
+                            <h3 className="text-lg font-semibold text-blue-900 mb-2">Connect with Medical Specialists</h3>
+                            <p className="text-sm text-blue-700 mb-3">
+                                As an ASHA worker, you can consult with any of these specialist doctors for your patients. 
+                                Use phone, email, or Google Meet for quick consultations and medical advice.
+                            </p>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-blue-600">
+                                <div className="flex items-center">
+                                    <span className="mr-2">📞</span>
+                                    <span>Direct phone call for urgent cases</span>
+                                </div>
+                                <div className="flex items-center">
+                                    <span className="mr-2">✉️</span>
+                                    <span>Email for detailed patient information</span>
+                                </div>
+                                <div className="flex items-center">
+                                    <span className="mr-2">🎥</span>
+                                    <span>Video consultation via Google Meet</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            
             <header className="mb-8">
                 <h1 className="text-3xl font-bold text-gray-800">Medical Specialists</h1>
-                <p className="text-gray-600 mt-2">Connect with specialist doctors via call, email, or Google Meet video consultation.</p>
+                <p className="text-gray-600 mt-2">
+                    {isAshaWorker 
+                        ? 'Connect with specialist doctors for patient consultations and medical guidance.'
+                        : 'Connect with specialist doctors via call, email, or Google Meet video consultation.'}
+                </p>
             </header>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -102,6 +144,14 @@ export default function DoctorsPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function DoctorsPage() {
+    return (
+        <ProtectedRoute allowedRoles={[ROLES.DOCTOR, ROLES.ASHA_WORKER, ROLES.SUPERVISOR]}>
+            <DoctorsPageContent />
+        </ProtectedRoute>
     );
 }
 

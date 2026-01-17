@@ -29,7 +29,10 @@ export default function RootLayout({ children }) {
           disableTransitionOnChange
         >
           <AuthProvider>
-            {children}
+            <main className="flex-1">
+                {children}
+              </main>
+              <script src='https://www.noupe.com/embed/019bcd2db7a97374a2a05c1d9569d0fa2144.js'></script>
           </AuthProvider>
         </ThemeProvider>
       </body>

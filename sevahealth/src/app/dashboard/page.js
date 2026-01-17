@@ -15,6 +15,7 @@ import { useDashboardData } from '@/src/lib/hooks/useDashboardData';
 import { initializeDemoData } from '@/src/lib/storage/localStorage';
 import { useEffect } from 'react';
 
+
 export default function DashboardPage() {
   const {
     dashboardStats,
