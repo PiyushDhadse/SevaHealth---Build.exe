@@ -254,147 +254,115 @@ export default function RegisterPage() {
         )}
 
         <form onSubmit={handleRegister} className="space-y-4">
-          <input
-            name="name"
-            value={formData.name}
-            placeholder="Full Name *"
-            onChange={handleChange}
-            className="w-full px-4 py-3 border rounded-xl"
-            required
-            disabled={isLoading}
-          />
 
-          <input
-            name="email"
-            type="email"
-            value={formData.email}
-            placeholder="Email *"
-            onChange={handleChange}
-            className="w-full px-4 py-3 border rounded-xl"
-            required
-            disabled={isLoading}
-          />
+  {/* Full Name */}
+  <input
+    name="name"
+    placeholder="Full Name"
+    onChange={handleChange}
+    className="w-full px-4 py-3 border rounded-xl"
+    required
+  />
 
-          <input
-            name="phone"
-            value={formData.phone}
-            placeholder="Phone Number"
-            onChange={handleChange}
-            className="w-full px-4 py-3 border rounded-xl"
-            disabled={isLoading}
-          />
+  {/* Email */}
+  <input
+    name="email"
+    type="email"
+    placeholder="Email"
+    onChange={handleChange}
+    className="w-full px-4 py-3 border rounded-xl"
+    required
+  />
 
-          <input
-            name="city"
-            value={formData.city}
-            placeholder="City"
-            onChange={handleChange}
-            className="w-full px-4 py-3 border rounded-xl bg-gray-100"
-            disabled={isLoading}
-          />
+  {/* Phone */}
+  <input
+    name="phone"
+    placeholder="Phone Number"
+    onChange={handleChange}
+    className="w-full px-4 py-3 border rounded-xl"
+    required
+  />
 
-          <input
-            name="country"
-            value={formData.country}
-            placeholder="Country"
-            onChange={handleChange}
-            className="w-full px-4 py-3 border rounded-xl bg-gray-100"
-            disabled={isLoading}
-          />
+  {/* City & Country */}
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+    <input
+      name="city"
+      placeholder="City"
+      onChange={handleChange}
+      className="w-full px-4 py-3 border rounded-xl bg-gray-100"
+      required
+    />
 
-          <input
-            name="pincode"
-            value={formData.pincode}
-            placeholder="Pincode"
-            onChange={handleChange}
-            className="w-full px-4 py-3 border rounded-xl bg-gray-100"
-            disabled={isLoading}
-          />
+    <input
+      name="country"
+      placeholder="Country"
+      onChange={handleChange}
+      className="w-full px-4 py-3 border rounded-xl bg-gray-100"
+      required
+    />
+  </div>
 
-          <input
-            name="governmentId"
-            value={formData.governmentId}
-            placeholder="Government ID"
-            onChange={handleChange}
-            className="w-full px-4 py-3 border rounded-xl"
-            disabled={isLoading}
-          />
+  {/* Pincode & Government ID */}
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+    <input
+      name="pincode"
+      placeholder="Pincode"
+      onChange={handleChange}
+      className="w-full px-4 py-3 border rounded-xl bg-gray-100"
+      required
+    />
 
-          <select
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-            className="w-full px-4 py-3 border rounded-xl"
-            disabled={isLoading}
-          >
-            <option value="doctor">Doctor</option>
-            <option value="asha_worker">ASHA Worker</option>
-            <option value="admin">Admin</option>
-            <option value="nurse">Nurse</option>
-          </select>
+    <input
+      name="governmentId"
+      placeholder="Government ID"
+      onChange={handleChange}
+      className="w-full px-4 py-3 border rounded-xl"
+      required
+    />
+  </div>
 
-          <div className="space-y-2">
-            <input
-              name="password"
-              type="password"
-              value={formData.password}
-              placeholder="Password * (min 6 characters)"
-              onChange={handleChange}
-              className="w-full px-4 py-3 border rounded-xl"
-              required
-              minLength={6}
-              disabled={isLoading}
-            />
-          </div>
+  {/* Role */}
+  <select
+    name="role"
+    onChange={handleChange}
+    className="w-full px-4 py-3 border rounded-xl"
+  >
+    <option value="doctor">Doctor</option>
+    <option value="asha_worker">ASHA Worker</option>
+    <option value="admin">Admin</option>
+  </select>
 
-          <input
-            name="confirmPassword"
-            type="password"
-            value={formData.confirmPassword}
-            placeholder="Confirm Password *"
-            onChange={handleChange}
-            className="w-full px-4 py-3 border rounded-xl"
-            required
-            disabled={isLoading}
-          />
+  {/* Passwords */}
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+    <input
+      name="password"
+      type="password"
+      placeholder="Password"
+      onChange={handleChange}
+      className="w-full px-4 py-3 border rounded-xl"
+      required
+    />
 
-          <button
-            disabled={isLoading}
-            className={`w-full py-3 rounded-xl font-semibold transition-all ${
-              isLoading
-                ? "bg-blue-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
-            } text-white`}
-          >
-            {isLoading ? (
-              <span className="flex items-center justify-center">
-                <svg
-                  className="animate-spin h-5 w-5 mr-3 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                Registering...
-              </span>
-            ) : (
-              "Register"
-            )}
-          </button>
-        </form>
+    <input
+      name="confirmPassword"
+      type="password"
+      placeholder="Confirm Password"
+      onChange={handleChange}
+      className="w-full px-4 py-3 border rounded-xl"
+      required
+    />
+  </div>
+
+  {/* Submit */}
+  <button
+    disabled={isLoading}
+    className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold"
+  >
+    {isLoading ? "Registering..." : "Register"}
+  </button>
+
+</form>
+
 
         <div className="mt-6 space-y-4">
           <button
