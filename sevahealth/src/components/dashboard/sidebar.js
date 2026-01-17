@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import {
   Home,
@@ -13,6 +12,7 @@ import {
   Stethoscope,
   ChevronRight,
   ShieldCheck,
+  Bot,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -61,6 +61,12 @@ const navItems = [
     name: "Settings",
     href: "/dashboard/settings",
     icon: Settings,
+    roles: [ROLES.DOCTOR, ROLES.ASHA_WORKER, ROLES.SUPERVISOR],
+  },
+  {
+    name: "SevaBot AI",
+    href: "/dashboard/sevabot",
+    icon: Bot, 
     roles: [ROLES.DOCTOR, ROLES.ASHA_WORKER, ROLES.SUPERVISOR],
   },
 ];

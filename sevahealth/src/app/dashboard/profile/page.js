@@ -1,186 +1,349 @@
+"use client";
+import { useState } from "react";
+import {
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Shield,
+  Camera,
+  Save,
+  FileText,
+  Download,
+  LogOut,
+  Briefcase,
+  Calendar,
+  Check,
+  AlertCircle,
+  X,
+} from "lucide-react";
+
 export default function ProfilePage() {
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Form State
+  const [formData, setFormData] = useState({
+    firstName: "ASHA",
+    lastName: "Supervisor",
+    email: "supervisor@sevahealth.in",
+    phone: "+91 98765 43210",
+    role: "Senior Field Supervisor",
+    location: "Rural Health Center, Block A",
+    district: "Satara, Maharashtra",
+    bio: "Dedicated to improving community health outcomes. Managing 24 ASHA workers across 12 villages since 2021.",
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setIsEditing(true);
+  };
+
+  const handleSave = () => {
+    setIsSaving(true);
+    // Simulate API call
+    setTimeout(() => {
+      setIsSaving(false);
+      setIsEditing(false);
+      // In a real app, trigger a toast here
+    }, 1500);
+  };
+
   return (
-    <div className="max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Profile Settings</h1>
-        <p className="text-gray-600">Manage your account and preferences</p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column - Profile Info */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Personal Information Card */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Personal Information</h2>
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    First Name
-                  </label>
-                  <input
-                    type="text"
-                    defaultValue="ASHA"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Last Name
-                  </label>
-                  <input
-                    type="text"
-                    defaultValue="Supervisor"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  defaultValue="supervisor@sevahealth.in"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  defaultValue="+91 9876543210"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Location / Area
-                </label>
-                <input
-                  type="text"
-                  defaultValue="Rural Health Center, Block A"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Account Settings Card */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Account Settings</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Change Password
-                </label>
-                <input
-                  type="password"
-                  placeholder="Current password"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-                <input
-                  type="password"
-                  placeholder="New password"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-                <input
-                  type="password"
-                  placeholder="Confirm new password"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="email-notifications"
-                  defaultChecked
-                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                />
-                <label htmlFor="email-notifications" className="ml-2 text-sm text-gray-700">
-                  Receive email notifications
-                </label>
-              </div>
-              
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="sms-alerts"
-                  defaultChecked
-                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                />
-                <label htmlFor="sms-alerts" className="ml-2 text-sm text-gray-700">
-                  Receive SMS alerts for urgent cases
-                </label>
-              </div>
-            </div>
-          </div>
+    <div className="min-h-screen bg-[#F8FAFC] p-4 md:p-8 font-sans text-slate-900">
+      {/* --- HEADER --- */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
+            My Profile
+          </h1>
+          <p className="text-slate-500 mt-1">
+            Manage your personal details and account security.
+          </p>
         </div>
 
-        {/* Right Column - Profile Summary */}
-        <div className="space-y-6">
-          {/* Profile Summary Card */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <div className="flex flex-col items-center">
-              <div className="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center mb-4">
-                <span className="text-2xl font-bold text-blue-600">AS</span>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900">ASHA Supervisor</h3>
-              <p className="text-sm text-gray-500 mb-4">Admin Account</p>
-              
-              <div className="w-full space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Account Type:</span>
-                  <span className="font-medium">Supervisor</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Member Since:</span>
-                  <span className="font-medium">Jan 2024</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Last Login:</span>
-                  <span className="font-medium">Today, 10:30 AM</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Active ASHAs:</span>
-                  <span className="font-medium">24</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Actions Card */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-            <div className="space-y-3">
-              <button className="w-full text-left px-4 py-3 text-sm text-blue-600 hover:bg-blue-50 rounded-lg">
-                Download Activity Report
-              </button>
-              <button className="w-full text-left px-4 py-3 text-sm text-blue-600 hover:bg-blue-50 rounded-lg">
-                Export Patient Data
-              </button>
-              <button className="w-full text-left px-4 py-3 text-sm text-blue-600 hover:bg-blue-50 rounded-lg">
-                View Access Logs
-              </button>
-              <button className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 rounded-lg">
-                Deactivate Account
-              </button>
-            </div>
-          </div>
-
-          {/* Save Button */}
-          <button className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition">
-            Save Changes
+        <div className="flex gap-3">
+          <button className="px-5 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl font-bold text-sm transition-colors shadow-sm">
+            Cancel
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={!isEditing || isSaving}
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold shadow-lg transition-all active:scale-95 ${
+              isEditing
+                ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-200"
+                : "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
+            }`}
+          >
+            {isSaving ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save size={18} />
+                Save Changes
+              </>
+            )}
           </button>
         </div>
       </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* --- LEFT COLUMN (Main Form) --- */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* 1. Personal Information */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2.5 rounded-xl bg-indigo-50 text-indigo-600">
+                <User size={20} />
+              </div>
+              <h2 className="text-lg font-bold text-slate-900">
+                Personal Information
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <InputField
+                label="First Name"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleChange}
+                icon={<User size={16} />}
+              />
+              <InputField
+                label="Last Name"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleChange}
+              />
+
+              <div className="md:col-span-2">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 block">
+                  Bio / Description
+                </label>
+                <textarea
+                  name="bio"
+                  rows="3"
+                  value={formData.bio}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all resize-none"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* 2. Contact & Location */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-600">
+                <MapPin size={20} />
+              </div>
+              <h2 className="text-lg font-bold text-slate-900">
+                Contact & Location
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <InputField
+                label="Email Address"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                icon={<Mail size={16} />}
+              />
+              <InputField
+                label="Phone Number"
+                name="phone"
+                type="tel"
+                value={formData.phone}
+                onChange={handleChange}
+                icon={<Phone size={16} />}
+              />
+              <InputField
+                label="Work Location"
+                name="location"
+                value={formData.location}
+                onChange={handleChange}
+                icon={<Briefcase size={16} />}
+              />
+              <InputField
+                label="District / State"
+                name="district"
+                value={formData.district}
+                onChange={handleChange}
+                icon={<MapPin size={16} />}
+              />
+            </div>
+          </div>
+
+          {/* 3. Security (Password) */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2.5 rounded-xl bg-slate-100 text-slate-600">
+                <Shield size={20} />
+              </div>
+              <h2 className="text-lg font-bold text-slate-900">Security</h2>
+            </div>
+
+            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <div className="bg-white p-2 rounded-lg border border-slate-200 text-slate-400">
+                  <Shield size={20} />
+                </div>
+                <div>
+                  <p className="font-bold text-slate-800 text-sm">Password</p>
+                  <p className="text-xs text-slate-500">
+                    Last changed 3 months ago
+                  </p>
+                </div>
+              </div>
+              <button className="px-4 py-2 bg-white border border-slate-300 hover:border-slate-400 text-slate-700 rounded-lg text-sm font-bold shadow-sm transition-all w-full md:w-auto">
+                Change Password
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* --- RIGHT COLUMN (Sidebar) --- */}
+        <div className="space-y-6">
+          {/* 1. Profile Card */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col items-center text-center relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-r from-indigo-500 to-purple-600"></div>
+
+            <div className="relative mt-8 mb-4 group cursor-pointer">
+              <div className="w-28 h-28 rounded-2xl bg-white p-1 shadow-lg rotate-3 group-hover:rotate-0 transition-transform duration-300">
+                <div className="w-full h-full bg-slate-100 rounded-xl overflow-hidden flex items-center justify-center relative">
+                  {/* Placeholder Image or User Initials */}
+                  <span className="text-3xl font-black text-indigo-300">
+                    AS
+                  </span>
+                  {/* Overlay */}
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Camera className="text-white" size={24} />
+                  </div>
+                </div>
+              </div>
+              <div className="absolute -bottom-2 -right-2 bg-white p-1.5 rounded-lg shadow-sm border border-slate-100 text-indigo-600">
+                <Camera size={14} />
+              </div>
+            </div>
+
+            <h2 className="text-xl font-black text-slate-900">
+              {formData.firstName} {formData.lastName}
+            </h2>
+            <p className="text-sm font-medium text-slate-500 mb-6">
+              {formData.role}
+            </p>
+
+            <div className="w-full grid grid-cols-2 gap-2 border-t border-slate-100 pt-4">
+              <div className="text-center p-2 rounded-lg hover:bg-slate-50 transition-colors">
+                <p className="text-xs text-slate-400 font-bold uppercase">
+                  Joined
+                </p>
+                <p className="font-bold text-slate-700 flex items-center justify-center gap-1">
+                  <Calendar size={12} /> Jan &apos;24
+                </p>
+              </div>
+              <div className="text-center p-2 rounded-lg hover:bg-slate-50 transition-colors">
+                <p className="text-xs text-slate-400 font-bold uppercase">
+                  Status
+                </p>
+                <p className="font-bold text-emerald-600 flex items-center justify-center gap-1">
+                  <Check size={12} /> Active
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* 2. Quick Actions */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-4">
+              Account Actions
+            </h3>
+            <div className="space-y-2">
+              <ActionButton
+                icon={<FileText size={16} />}
+                label="Activity Logs"
+              />
+              <ActionButton
+                icon={<Download size={16} />}
+                label="Download Data"
+              />
+
+              <div className="h-px bg-slate-100 my-2"></div>
+
+              <button className="w-full flex items-center justify-between px-4 py-3 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-xl text-sm font-bold transition-colors group">
+                <span className="flex items-center gap-3">
+                  <LogOut
+                    size={16}
+                    className="text-rose-400 group-hover:text-rose-600"
+                  />
+                  Sign Out
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* 3. Support Widget */}
+          <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden">
+            <div className="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
+            <div className="relative z-10">
+              <h3 className="font-bold text-lg mb-1">Need Help?</h3>
+              <p className="text-indigo-100 text-sm mb-4">
+                Contact IT support for account issues.
+              </p>
+              <button className="w-full py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/20 rounded-lg text-sm font-bold transition-colors">
+                Contact Support
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  );
+}
+
+// --- SUB COMPONENTS ---
+
+function InputField({ label, name, type = "text", value, onChange, icon }) {
+  return (
+    <div className="space-y-2">
+      <label className="text-xs font-bold text-slate-500 uppercase tracking-wide flex items-center justify-between">
+        {label}
+      </label>
+      <div className="relative group">
+        <input
+          type={type}
+          name={name}
+          value={value}
+          onChange={onChange}
+          className="w-full pl-4 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400"
+        />
+        {icon && (
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors pointer-events-none">
+            {icon}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ActionButton({ icon, label }) {
+  return (
+    <button className="w-full flex items-center justify-between px-4 py-3 bg-white hover:bg-slate-50 border border-slate-100 rounded-xl text-slate-600 text-sm font-medium transition-colors group">
+      <span className="flex items-center gap-3">
+        <span className="text-slate-400 group-hover:text-indigo-600 transition-colors">
+          {icon}
+        </span>
+        {label}
+      </span>
+      <span className="text-slate-300 group-hover:translate-x-1 transition-transform">
+        →
+      </span>
+    </button>
   );
 }

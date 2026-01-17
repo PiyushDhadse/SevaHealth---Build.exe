@@ -3,8 +3,24 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/src/lib/supabase/Client";
-import { hashPassword, validatePassword } from "@/src/lib/utils/passwordUtils";
+import {
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Building,
+  FileBadge,
+  Lock,
+  ArrowRight,
+  ShieldCheck,
+  CheckCircle2,
+  AlertCircle,
+  Stethoscope,
+  UserCog,
+  UserCheck,
+  Activity,
+  Wand2,
+} from "lucide-react";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -31,35 +47,19 @@ export default function RegisterPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // MOCK REGISTRATION HANDLER
   const handleRegister = async (e) => {
     e.preventDefault();
+    const { name, email, role, password, confirmPassword } = formData;
 
-    const {
-      name,
-      email,
-      phone,
-      city,
-      country,
-      pincode,
-      governmentId,
-      role,
-      password,
-      confirmPassword,
-    } = formData;
-
-    // Validation
+    // Basic Validation
     if (!name || !email || !password) {
-      setError("Name, email and password are required");
+      setError("Please fill in all required fields.");
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters");
+      setError("Passwords do not match.");
       return;
     }
 
@@ -68,168 +68,56 @@ export default function RegisterPage() {
       setError("");
       setSuccess("");
 
-      // Validate password
-      const passwordValidation = validatePassword(password);
-      if (!passwordValidation.valid) {
-        setError(passwordValidation.error);
-        return;
-      }
+      // 1. Simulate Network Delay
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      console.log("1. Checking if user already exists...");
+      // 2. Determine Dashboard Route
+      let redirectPath = "/dashboard";
+      if (role === "doctor") redirectPath = "/dashboard/doctor";
+      else if (role === "asha_worker") redirectPath = "/dashboard/asha";
+      else if (role === "admin") redirectPath = "/dashboard/admin";
+      else if (role === "nurse") redirectPath = "/dashboard/nurse";
 
-      // Step 1: Check if user already exists
-      const { data: existingUser } = await supabase
-        .from("users")
-        .select("email")
-        .eq("email", email.trim())
-        .single();
-
-      if (existingUser) {
-        throw new Error("User with this email already exists");
-      }
-
-      console.log("2. Hashing password...");
-
-      // Step 2: Hash password
-      const passwordHash = await hashPassword(password);
-
-      console.log("3. Creating user in database...");
-
-      // Step 3: Insert user directly into database
-      const { data: newUser, error: insertError } = await supabase
-        .from("users")
-        .insert({
-          email: email.trim(),
-          password_hash: passwordHash,
-          name: name,
-          phone: phone || null,
-          city: city || null,
-          country: country || "India",
-          pincode: pincode || null,
-          gov_id: governmentId || null,
-          user_type: role,
-          is_active: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        })
-        .select()
-        .single();
-
-      if (insertError) {
-        console.error("Insert error:", insertError);
-        console.error("Error details:", {
-          message: insertError.message,
-          code: insertError.code,
-          details: insertError.details,
-          hint: insertError.hint,
-        });
-
-        // Provide helpful error messages
-        let errorMessage = insertError.message || "Failed to create account";
-        if (insertError.code === "42501") {
-          errorMessage =
-            "Permission denied. Check RLS policies or grant permissions.";
-        } else if (insertError.code === "42P01") {
-          errorMessage =
-            "Table 'users' does not exist. Run supabase_schema.sql first!";
-        } else if (insertError.code === "23505") {
-          errorMessage = "User with this email already exists.";
-        } else if (
-          insertError.message?.includes("column") &&
-          insertError.message?.includes("does not exist")
-        ) {
-          errorMessage = `Database column error: ${insertError.message}. Check schema!`;
-        }
-
-        throw new Error(errorMessage);
-      }
-
-      if (!newUser) {
-        throw new Error(
-          "User creation failed. No data returned from database."
-        );
-      }
-
-      console.log("✅ User created successfully:", newUser.id);
-      console.log("✅ User data:", JSON.stringify(newUser, null, 2));
-
-      // Step 4: Verify user was actually created (double check)
-      console.log("4. Verifying user in database...");
-      const { data: verifyUser, error: verifyError } = await supabase
-        .from("users")
-        .select("*")
-        .eq("id", newUser.id)
-        .single();
-
-      if (verifyError || !verifyUser) {
-        console.error("Verification error:", verifyError);
-        throw new Error(
-          "User was created but verification failed. Please check database."
-        );
-      }
-
-      console.log("✅ User verified:", verifyUser.email);
-
-      // Step 5: Log activity (non-blocking)
-      try {
-        await supabase.from("activity_log").insert({
-          user_id: newUser.id,
-          action: "USER_REGISTER",
-          entity_type: "user",
-          entity_id: newUser.id,
-          details: {
-            email: email,
-            role: role,
-            name: name,
-            method: "custom_auth",
-          },
-          ip_address: "web_registration",
-          user_agent: navigator.userAgent,
-          created_at: new Date().toISOString(),
-        });
-        console.log("✅ Activity logged");
-      } catch (logErr) {
-        console.warn("Activity logging failed (non-critical):", logErr);
-      }
-
-      // Step 5: Store user info in localStorage
-      const userInfo = {
-        id: newUser.id,
+      // 3. Create Mock User Object
+      const mockUser = {
+        id: `mock-user-${Date.now()}`,
         email: email,
         name: name,
         role: role,
         user_type: role,
         logged_in: true,
+        last_login: new Date().toISOString(),
       };
 
-      localStorage.setItem("current_user", JSON.stringify(userInfo));
-      localStorage.setItem("auth_user", JSON.stringify(userInfo));
+      // 4. Store Session (Mock)
+      localStorage.setItem("current_user", JSON.stringify(mockUser));
+      localStorage.setItem("auth_user", JSON.stringify(mockUser));
 
-      console.log("✅ Registration complete, redirecting...");
-      setSuccess("Registration successful! Redirecting to dashboard...");
+      console.log("✅ Mock Registration Successful:", mockUser);
+      setSuccess("Account created successfully! Redirecting...");
 
+      // 5. Redirect
       setTimeout(() => {
-        router.push("/dashboard");
-      }, 1500);
+        router.push(redirectPath);
+      }, 1000);
     } catch (err) {
       console.error("Registration error:", err);
-      setError(err.message || "Registration failed. Please try again.");
-      setSuccess("");
+      setError("Something went wrong. Please try again.");
     } finally {
-      setIsLoading(false);
+      if (!success) setIsLoading(false);
     }
   };
 
-  // Fill demo data for testing
+  // Helper to fill demo data
   const fillDemoData = () => {
     setFormData({
-      name: "Demo User",
-      email: `demo${Date.now()}@test.com`,
+      name: "Dr. New User",
+      email: `doctor-${Math.floor(Math.random() * 1000)}@seva.com`,
       phone: "9876543210",
       city: "Mumbai",
       country: "India",
       pincode: "400001",
-      governmentId: "DEMO123",
+      governmentId: "MED-ID-8829",
       role: "doctor",
       password: "demo123",
       confirmPassword: "demo123",
@@ -237,189 +125,274 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-white to-teal-50 flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl">
-        <h2 className="text-2xl font-bold text-center mb-6">Create Account</h2>
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 md:p-8 relative overflow-hidden">
+      {/* Background Decor */}
+      <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-br from-indigo-600 to-slate-50 -z-10" />
 
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-600 text-sm">{error}</p>
-          </div>
-        )}
+      <div className="w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-white/50 animate-in fade-in zoom-in-95 duration-300 overflow-hidden">
+        {/* Header */}
+        <div className="bg-slate-50/50 p-8 border-b border-slate-100 text-center">
+          <Link href="/" className="inline-flex items-center gap-2 mb-4 group">
+            <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-200 group-hover:scale-105 transition-transform">
+              <Activity className="w-6 h-6 text-white" />
+            </div>
+            <span className="text-xl font-black text-slate-800 tracking-tight">
+              SevaHealth
+            </span>
+          </Link>
+          <h2 className="text-2xl font-bold text-slate-900">
+            Create your Account
+          </h2>
+          <p className="text-slate-500 text-sm mt-1">
+            Join our healthcare network today
+          </p>
+        </div>
 
-        {success && (
-          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-            <p className="text-green-600 text-sm">{success}</p>
-          </div>
-        )}
+        <div className="p-8">
+          {error && (
+            <div className="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-xl flex items-start gap-3 text-sm text-rose-700 animate-in slide-in-from-top-2">
+              <AlertCircle size={18} className="shrink-0 mt-0.5" />
+              <p className="font-medium">{error}</p>
+            </div>
+          )}
 
-        <form onSubmit={handleRegister} className="space-y-4">
-          <input
-            name="name"
-            value={formData.name}
-            placeholder="Full Name *"
-            onChange={handleChange}
-            className="w-full px-4 py-3 border rounded-xl"
-            required
-            disabled={isLoading}
-          />
+          {success && (
+            <div className="mb-6 p-4 bg-emerald-50 border border-emerald-100 rounded-xl flex items-start gap-3 text-sm text-emerald-700 animate-in slide-in-from-top-2">
+              <CheckCircle2 size={18} className="shrink-0 mt-0.5" />
+              <p className="font-medium">{success}</p>
+            </div>
+          )}
 
-          <input
-            name="email"
-            type="email"
-            value={formData.email}
-            placeholder="Email *"
-            onChange={handleChange}
-            className="w-full px-4 py-3 border rounded-xl"
-            required
-            disabled={isLoading}
-          />
+          <form onSubmit={handleRegister} className="space-y-6">
+            {/* --- Personal Info Section --- */}
+            <div className="space-y-4">
+              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                <UserCheck size={14} /> Personal Information
+              </h3>
 
-          <input
-            name="phone"
-            value={formData.phone}
-            placeholder="Phone Number"
-            onChange={handleChange}
-            className="w-full px-4 py-3 border rounded-xl"
-            disabled={isLoading}
-          />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Name */}
+                <div className="relative group">
+                  <div className="absolute left-3 top-3.5 text-slate-400">
+                    <User size={18} />
+                  </div>
+                  <input
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder="Full Name *"
+                    required
+                    disabled={isLoading}
+                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder:text-slate-400"
+                  />
+                </div>
 
-          <input
-            name="city"
-            value={formData.city}
-            placeholder="City"
-            onChange={handleChange}
-            className="w-full px-4 py-3 border rounded-xl bg-gray-100"
-            disabled={isLoading}
-          />
+                {/* Email */}
+                <div className="relative group">
+                  <div className="absolute left-3 top-3.5 text-slate-400">
+                    <Mail size={18} />
+                  </div>
+                  <input
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="Email Address *"
+                    required
+                    disabled={isLoading}
+                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder:text-slate-400"
+                  />
+                </div>
 
-          <input
-            name="country"
-            value={formData.country}
-            placeholder="Country"
-            onChange={handleChange}
-            className="w-full px-4 py-3 border rounded-xl bg-gray-100"
-            disabled={isLoading}
-          />
+                {/* Phone */}
+                <div className="relative group">
+                  <div className="absolute left-3 top-3.5 text-slate-400">
+                    <Phone size={18} />
+                  </div>
+                  <input
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="Phone Number"
+                    disabled={isLoading}
+                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder:text-slate-400"
+                  />
+                </div>
 
-          <input
-            name="pincode"
-            value={formData.pincode}
-            placeholder="Pincode"
-            onChange={handleChange}
-            className="w-full px-4 py-3 border rounded-xl bg-gray-100"
-            disabled={isLoading}
-          />
+                {/* Role Selection */}
+                <div className="relative group">
+                  <div className="absolute left-3 top-3.5 text-slate-400">
+                    {formData.role === "doctor" ? (
+                      <Stethoscope size={18} />
+                    ) : (
+                      <UserCog size={18} />
+                    )}
+                  </div>
+                  <select
+                    name="role"
+                    value={formData.role}
+                    onChange={handleChange}
+                    disabled={isLoading}
+                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all appearance-none cursor-pointer"
+                  >
+                    <option value="doctor">Doctor</option>
+                    <option value="asha_worker">ASHA Worker</option>
+                    <option value="nurse">Nurse</option>
+                    <option value="admin">Administrator</option>
+                  </select>
+                  <div className="absolute right-3 top-3.5 text-slate-400 pointer-events-none">
+                    <ArrowRight size={14} className="rotate-90" />
+                  </div>
+                </div>
+              </div>
+            </div>
 
-          <input
-            name="governmentId"
-            value={formData.governmentId}
-            placeholder="Government ID"
-            onChange={handleChange}
-            className="w-full px-4 py-3 border rounded-xl"
-            disabled={isLoading}
-          />
+            {/* --- Location & ID Section --- */}
+            <div className="space-y-4 pt-2">
+              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                <Building size={14} /> Location & Verification
+              </h3>
 
-          <select
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-            className="w-full px-4 py-3 border rounded-xl"
-            disabled={isLoading}
-          >
-            <option value="doctor">Doctor</option>
-            <option value="asha_worker">ASHA Worker</option>
-            <option value="admin">Admin</option>
-            <option value="nurse">Nurse</option>
-          </select>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="relative group md:col-span-1">
+                  <div className="absolute left-3 top-3.5 text-slate-400">
+                    <MapPin size={18} />
+                  </div>
+                  <input
+                    name="city"
+                    value={formData.city}
+                    onChange={handleChange}
+                    placeholder="City"
+                    disabled={isLoading}
+                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                  />
+                </div>
+                <div className="relative group md:col-span-1">
+                  <input
+                    name="country"
+                    value={formData.country}
+                    onChange={handleChange}
+                    placeholder="Country"
+                    disabled={isLoading}
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                  />
+                </div>
+                <div className="relative group md:col-span-1">
+                  <input
+                    name="pincode"
+                    value={formData.pincode}
+                    onChange={handleChange}
+                    placeholder="Pincode"
+                    disabled={isLoading}
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                  />
+                </div>
+              </div>
 
-          <div className="space-y-2">
-            <input
-              name="password"
-              type="password"
-              value={formData.password}
-              placeholder="Password * (min 6 characters)"
-              onChange={handleChange}
-              className="w-full px-4 py-3 border rounded-xl"
-              required
-              minLength={6}
+              <div className="relative group">
+                <div className="absolute left-3 top-3.5 text-slate-400">
+                  <FileBadge size={18} />
+                </div>
+                <input
+                  name="governmentId"
+                  value={formData.governmentId}
+                  onChange={handleChange}
+                  placeholder="Government ID / Medical License Number"
+                  disabled={isLoading}
+                  className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                />
+              </div>
+            </div>
+
+            {/* --- Security Section --- */}
+            <div className="space-y-4 pt-2">
+              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                <ShieldCheck size={14} /> Security
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="relative group">
+                  <div className="absolute left-3 top-3.5 text-slate-400">
+                    <Lock size={18} />
+                  </div>
+                  <input
+                    name="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="Password *"
+                    required
+                    disabled={isLoading}
+                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                  />
+                </div>
+                <div className="relative group">
+                  <div className="absolute left-3 top-3.5 text-slate-400">
+                    <Lock size={18} />
+                  </div>
+                  <input
+                    name="confirmPassword"
+                    type="password"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    placeholder="Confirm Password *"
+                    required
+                    disabled={isLoading}
+                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="pt-4">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-xl font-bold text-sm shadow-lg shadow-indigo-200 flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                {isLoading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Creating Account...
+                  </>
+                ) : (
+                  <>
+                    Complete Registration <ArrowRight size={18} />
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+
+          {/* Footer Controls */}
+          <div className="mt-8 flex flex-col md:flex-row items-center justify-between gap-4 border-t border-slate-100 pt-6">
+            <button
+              onClick={fillDemoData}
               disabled={isLoading}
-            />
+              className="text-xs font-bold text-slate-400 hover:text-indigo-600 flex items-center gap-1 transition-colors uppercase tracking-wide"
+            >
+              <Wand2 size={14} /> Quick Fill (Dev Mode)
+            </button>
+
+            <p className="text-sm text-slate-500 font-medium">
+              Already have an account?{" "}
+              <Link
+                href="/login"
+                className="text-indigo-600 font-bold hover:text-indigo-700 transition-colors"
+              >
+                Sign In
+              </Link>
+            </p>
           </div>
-
-          <input
-            name="confirmPassword"
-            type="password"
-            value={formData.confirmPassword}
-            placeholder="Confirm Password *"
-            onChange={handleChange}
-            className="w-full px-4 py-3 border rounded-xl"
-            required
-            disabled={isLoading}
-          />
-
-          <button
-            disabled={isLoading}
-            className={`w-full py-3 rounded-xl font-semibold transition-all ${
-              isLoading
-                ? "bg-blue-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
-            } text-white`}
-          >
-            {isLoading ? (
-              <span className="flex items-center justify-center">
-                <svg
-                  className="animate-spin h-5 w-5 mr-3 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                Registering...
-              </span>
-            ) : (
-              "Register"
-            )}
-          </button>
-        </form>
-
-        <div className="mt-6 space-y-4">
-          <button
-            onClick={fillDemoData}
-            className="w-full p-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200"
-            disabled={isLoading}
-          >
-            Fill Demo Data
-          </button>
-
-          <p className="text-center text-sm">
-            Already registered?{" "}
-            <Link href="/login" className="text-blue-600 hover:underline">
-              Login
-            </Link>
-          </p>
         </div>
+      </div>
 
-        {/* Info box */}
-        <div className="mt-6 p-3 bg-blue-50 rounded-lg border border-blue-100">
-          <p className="text-xs text-blue-800">
-            <strong>Direct Registration:</strong> No email confirmation needed.
-            Instant access.
-          </p>
-        </div>
+      {/* Footer Branding */}
+      <div className="absolute bottom-6 text-center w-full pointer-events-none hidden md:block">
+        <p className="text-xs text-slate-400 font-medium flex items-center justify-center gap-1">
+          <ShieldCheck size={12} />
+          Secure HIPAA Compliant Registration
+        </p>
       </div>
     </div>
   );
