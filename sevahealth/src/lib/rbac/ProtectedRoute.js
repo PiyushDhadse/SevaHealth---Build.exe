@@ -26,9 +26,15 @@ export function ProtectedRoute({ children, allowedRoles = [], redirectTo = '/das
       return;
     }
 
+    // Skip further checks if it's a mock user (global access)
+    if (user.is_mock) {
+      setIsAuthorized(true);
+      return;
+    }
+
     // Check if user has access to this route
     const hasAccess = allowedRoles.length === 0 || allowedRoles.includes(user.user_type);
-    
+
     if (!hasAccess) {
       console.warn(`Access denied for user role: ${user.user_type} to route: ${pathname}`);
       router.push(redirectTo);
@@ -72,9 +78,9 @@ export function ProtectedRoute({ children, allowedRoles = [], redirectTo = '/das
  */
 export function usePermission(permission) {
   const { user } = useAuth();
-  
+
   if (!user || !user.user_type) return false;
-  
+
   const { hasPermission } = require('./permissions');
   return hasPermission(user.user_type, permission);
 }
@@ -84,6 +90,6 @@ export function usePermission(permission) {
  */
 export function RequirePermission({ permission, children, fallback = null }) {
   const hasAccess = usePermission(permission);
-  
+
   return hasAccess ? <>{children}</> : <>{fallback}</>;
 }
