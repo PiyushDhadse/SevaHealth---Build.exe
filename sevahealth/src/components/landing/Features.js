@@ -1,11 +1,11 @@
-import { Badge } from "@/components/ui/Badge";
+import { Badge } from "@/src/components/ui/Badge";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
   CardContent,
-} from "@/components/ui/Card";
+} from "@/src/components/ui/Card";
 
 const features = [
   {

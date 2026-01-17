@@ -10,9 +10,14 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     // Check for existing session on mount
-    const currentUser = auth.getCurrentUser();
-    if (currentUser) {
-      setUser(currentUser);
+    try {
+      const currentUser = auth.getCurrentUser();
+      if (currentUser) {
+        console.log('AuthContext: Initializing with user:', currentUser);
+        setUser(currentUser);
+      }
+    } catch (err) {
+      console.error('AuthContext: Failed to load user:', err);
     }
     setLoading(false);
   }, []);
@@ -21,7 +26,9 @@ export function AuthProvider({ children }) {
     setLoading(true);
     const result = await auth.login(email, password);
     if (result.success) {
-      setUser(auth.getCurrentUser());
+      const currentUser = auth.getCurrentUser();
+      console.log('AuthContext: Login success, setting user:', currentUser);
+      setUser(currentUser);
     }
     setLoading(false);
     return result;

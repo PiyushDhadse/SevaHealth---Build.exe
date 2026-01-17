@@ -1,15 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/src/components/ui/button";
+import { Badge } from "@/src/components/ui/Badge";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
   CardContent,
-} from "@/components/ui/Card";
+} from "@/src/components/ui/Card";
 
 function Stat({ label, value, trend, tone = "default" }) {
   return (
@@ -71,11 +71,23 @@ export default function HeroSection() {
 
           <div className="flex flex-wrap items-center gap-4">
             <Button asChild size="lg">
-              <Link href="/login">Launch dashboard</Link>
+              <Link href="/login">Sign In</Link>
             </Button>
             <Button asChild variant="outline" size="lg">
-              <Link href="/register">Create coordinator account</Link>
+              <Link href="/register">Create Account</Link>
             </Button>
+          </div>
+
+          <div className="pt-4 space-y-3">
+            <p className="text-sm font-medium text-slate-700">Try the demo dashboards:</p>
+            <div className="flex flex-wrap gap-3">
+              <Button asChild variant="secondary" size="sm" className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200">
+                <Link href="/login?demo=asha_worker">ASHA Worker Demo</Link>
+              </Button>
+              <Button asChild variant="secondary" size="sm" className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200">
+                <Link href="/login?demo=doctor">Doctor Demo</Link>
+              </Button>
+            </div>
           </div>
 
           <dl className="mt-8 grid grid-cols-2 gap-4 text-sm text-muted-foreground sm:grid-cols-3">
