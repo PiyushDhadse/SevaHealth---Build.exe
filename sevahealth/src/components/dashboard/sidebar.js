@@ -13,7 +13,8 @@ import {
   Stethoscope,
   ChevronRight,
   ShieldCheck,
-  HelpCircle
+  HelpCircle,
+  Bot, // <--- Added Bot Icon
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -29,27 +30,27 @@ const navItems = [
     roles: [ROLES.DOCTOR, ROLES.ASHA_WORKER, ROLES.SUPERVISOR],
   },
   {
+    name: "SevaBot AI", // <--- NEW NAV ITEM
+    href: "/dashboard/sevabot",
+    icon: Bot,
+    roles: [ROLES.DOCTOR, ROLES.ASHA_WORKER, ROLES.SUPERVISOR],
+  },
+  {
     name: "Patients",
     href: "/dashboard/patients",
     icon: Users,
     roles: [ROLES.DOCTOR, ROLES.ASHA_WORKER, ROLES.SUPERVISOR],
   },
   {
-    name: "FAQ & Help",
-    href: "/dashboard/faq",
-    icon: HelpCircle,
-    roles: [ROLES.DOCTOR, ROLES.ASHA_WORKER, ROLES.SUPERVISOR],
-  },
-  {
-    name: "ASHA Workers",
-    href: "/dashboard/workers",
-    icon: UserCheck,
-    roles: [ROLES.DOCTOR, ROLES.SUPERVISOR],
-  },
-  {
     name: "Alerts",
     href: "/dashboard/alerts",
     icon: AlertTriangle,
+    roles: [ROLES.DOCTOR, ROLES.ASHA_WORKER, ROLES.SUPERVISOR],
+  },
+  {
+    name: "Doctor Panel",
+    href: "/dashboard/doctor",
+    icon: Stethoscope,
     roles: [ROLES.DOCTOR, ROLES.ASHA_WORKER, ROLES.SUPERVISOR],
   },
   {
@@ -59,9 +60,15 @@ const navItems = [
     roles: [ROLES.DOCTOR, ROLES.ASHA_WORKER, ROLES.SUPERVISOR],
   },
   {
-    name: "Doctor Panel",
-    href: "/dashboard/doctor",
-    icon: Stethoscope,
+    name: "ASHA Workers",
+    href: "/dashboard/workers",
+    icon: UserCheck,
+    roles: [ROLES.DOCTOR, ROLES.SUPERVISOR],
+  },
+  {
+    name: "FAQ & Help",
+    href: "/dashboard/faq",
+    icon: HelpCircle,
     roles: [ROLES.DOCTOR, ROLES.ASHA_WORKER, ROLES.SUPERVISOR],
   },
   {
