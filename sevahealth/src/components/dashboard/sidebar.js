@@ -1,5 +1,5 @@
 'use client';
-import { Home, Users, AlertTriangle, FileText, Settings, LogOut, Activity, UserCheck } from 'lucide-react';
+import { Home, Users, AlertTriangle, FileText, Settings, LogOut, Activity, UserCheck, Stethoscope} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -9,7 +9,8 @@ const navItems = [
   { name: 'ASHA Workers', href: '/dashboard/workers', icon: UserCheck },
   { name: 'Alerts', href: '/dashboard/alerts', icon: AlertTriangle },
   { name: 'Reports', href: '/dashboard/reports', icon: FileText },
-  { name: 'Settings', href: '/dashboard/settings', icon: Settings },
+  { name: 'Doctor', href: '/dashboard/doctor', icon: Stethoscope },
+  { name: 'Settings', href: '/dashboard/settings', icon: Settings }
 ];
 
 export default function Sidebar() {
