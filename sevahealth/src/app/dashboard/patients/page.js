@@ -14,7 +14,7 @@ import {
   User,
   Activity,
 } from "lucide-react";
-import AddPatientModal from "@/src/app/dashboard/patients/AddPatientModal";
+import AddPatientModal from "@/src/app/dashboard/patients/AddpatientModal";
 import PatientDetails from "@/src/app/dashboard/patients/PatientDetails";
 
 // --- ROBUST MOCK DATA ---
