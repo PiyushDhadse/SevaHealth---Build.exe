@@ -96,9 +96,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 md:p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-r from-blue-100 via-indigo-400 to-blue-400 flex items-center justify-center p-4 md:p-6 relative overflow-hidden">
       {/* Background Decor */}
-      <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-indigo-600 to-slate-50 -z-10" />
+      <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-indigo-600 to-blue-600 -z-10" />
 
       <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl border border-white/50 p-8 md:p-10 animate-in fade-in zoom-in-95 duration-300">
         {/* Header Section */}

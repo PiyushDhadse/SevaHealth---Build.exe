@@ -1,10 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  /* config options here */
   reactCompiler: true,
-  typescript: {
-    // This is likely still valid and helps with TS errors
-    ignoreBuildErrors: true,
-  },
 };
 
 export default nextConfig;

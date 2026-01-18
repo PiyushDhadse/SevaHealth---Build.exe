@@ -125,7 +125,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 md:p-8 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-r from-blue-100 via-indigo-400 to-blue-400 flex items-center justify-center p-4 md:p-8 relative overflow-hidden">
       {/* Background Decor */}
       <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-br from-indigo-600 to-slate-50 -z-10" />
 
