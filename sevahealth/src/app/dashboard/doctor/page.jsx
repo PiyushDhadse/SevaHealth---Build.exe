@@ -4,8 +4,8 @@ import {
   Stethoscope, Search, Filter, Phone, Mail, Video, 
   MapPin, Clock, CalendarCheck, Star, Plus, X, Save
 } from 'lucide-react';
-import { ProtectedRoute, useRolePermissions } from '@/src/lib/rbac';
-import { ROLES } from '@/src/lib/rbac/permissions';
+import { ProtectedRoute, useRolePermissions } from '../../rbac';
+import { ROLES } from '../../permissions';
 
 // --- INITIAL MOCK DATA ---
 const initialDoctorsData = [

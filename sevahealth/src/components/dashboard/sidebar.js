@@ -18,8 +18,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useAuth } from "@/src/context/AuthContext";
-import { ROLES } from "@/src/lib/rbac";
+import { useAuth } from "../../context/AuthContext";
+import { ROLES } from "../../permissions";
 
 // Navigation configuration
 const navItems = [

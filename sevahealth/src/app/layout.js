@@ -1,7 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from 'next-themes';
-import { AuthProvider } from '@/src/context/AuthContext';
-import "@/src/styles/globals.css";
+import { AuthProvider } from 'next-auth/react';
+import "../../globals.css";
 import { Roboto } from "next/font/google";
 
 const roboto = Roboto({

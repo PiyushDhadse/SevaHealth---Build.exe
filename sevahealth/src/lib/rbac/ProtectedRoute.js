@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { useAuth } from '@/src/context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { canAccessRoute } from './permissions';
 
 /**

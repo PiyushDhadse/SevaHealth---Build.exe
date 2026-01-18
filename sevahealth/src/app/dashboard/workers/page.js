@@ -6,8 +6,8 @@ import {
   Filter, TrendingUp, Smartphone, MoreVertical, 
   CheckCircle, AlertCircle, Star
 } from 'lucide-react';
-import { ProtectedRoute } from '@/src/lib/rbac';
-import { ROLES } from '@/src/lib/rbac/permissions';
+import { ProtectedRoute } from '../../rbac';
+import { ROLES } from '../../permissions';
 import AddWorkerModal from './AddWorkerModal';
 
 // --- ROBUST MOCK DATA ---

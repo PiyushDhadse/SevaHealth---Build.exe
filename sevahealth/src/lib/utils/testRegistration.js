@@ -1,4 +1,4 @@
-import { supabase } from "@/src/lib/supabase/Client";
+import { supabase } from "../../lib/supabase/Client";
 
 /**
  * Test if registration flow works

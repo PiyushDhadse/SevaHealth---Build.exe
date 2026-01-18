@@ -1,4 +1,4 @@
-import { supabase } from "@/src/lib/supabase/Client";
+import { supabase } from "../../lib/supabase/Client";
 
 /**
  * Get client IP address using free services (with fallbacks)

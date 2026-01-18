@@ -1,6 +1,6 @@
 'use client';
 import { useMemo } from 'react';
-import { useAuth } from '@/src/context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { filterDataByRole, hasPermission, ROLES } from './permissions';
 
 /**
